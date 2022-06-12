@@ -1,8 +1,12 @@
-from typing import List, Type
+from typing import TYPE_CHECKING, List, Type
 
-from nonebot.adapters.onebot.v12 import Adapter, Event
+from nonebot.adapters.onebot.v12 import Bot, Adapter, Event
 
 from .event import *
+
+# 在编写代码的时候会检查为WQ的bot，但运行时还是V12的Bot，这样就实现了只作为编译器提示，不实现任何功能
+if TYPE_CHECKING:
+    from .bot import Bot as Bot
 
 
 ADD_MODELS: List[Type[Event]] = []
