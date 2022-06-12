@@ -1,8 +1,8 @@
 import datetime
 from typing_extensions import Literal
-from nonebot.adapters.onebot.v12 import Adapter, Event
+from nonebot.adapters.onebot.v12 import Adapter, Event, PrivateMessageEvent
 
-from nonebot_walleq_extension import WQFriendAddRequestEvent as test_event
+from nonebot_walleq_extension import WQGroupTempPrivateMessageEvent as test_event
 
 # 引入测试event
 # Adapter.add_custom_model((test_event),
@@ -11,31 +11,30 @@ from nonebot_walleq_extension import WQFriendAddRequestEvent as test_event
 #                          )
 
 # 构建测试数据
-test_data = {'id': '00000000-0000-0000-16f7-33949fbdc188',
-             'impl': 'Walle-Q',
-             'platform': 'qq',
-             'self_id': '123456789',
-             'time': datetime.datetime(2022, 6, 1, 12, 0, 0, 510135, tzinfo=datetime.timezone.utc),
-             'type': 'request',
-             'detail_type': 'new_friend',
-             'sub_type': '',
-             'user_name': '测试',
-             'request_id': 1652676348000000,
-             'message': '测试请求',
-             'user_id': '987654321'
-             }
+test_data = {
+    'id': '00000000-0000-0000-16f7-dee8e66251bc',
+    'impl': 'Walle-Q',
+    'platform': 'qq',
+    'self_id': '2657565907',
+    'time': 1655036480.0,
+    'type': 'message',
+    'detail_type': 'private',
+    'sub_type': '',
+    'user_name': '',
+    'message_id': '4561',
+    'message': [{'type': 'text', 'data': {'text': '1'}}],
+    'alt_message': '1',
+    'user_id': '1342810270'
+}
 
 # 测试能否实例化
 event = Adapter.json_to_event(test_data, "test_id")
 match event:
     case test_event():
-        print("FriendAddRequestEvent")
-
-        print(event.detail_type)
-        print(event.user_id)
-        print(event.user_name)
-        print(event.message)
-        print([event.request_id])
+        print("WQGroupTempPrivateMessageEvent")
+        ...
+    case PrivateMessageEvent():
+        print("PrivateMessageEvent")
         ...
     case Event():
         print("实例化失败")
