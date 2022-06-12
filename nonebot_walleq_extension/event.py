@@ -1,12 +1,14 @@
-from nonebot.adapters.onebot.v12 import Bot, RequestEvent, NoticeEvent, MessageEvent, PrivateMessageEvent
+from nonebot.adapters.onebot.v12 import NoticeEvent, PrivateMessageEvent, RequestEvent
 from typing_extensions import Literal
+
 # from nonebot.typing import overrides # 以后可能会用
+from .bot import Bot
 
 
 class WQGroupTempPrivateMessageEvent(PrivateMessageEvent):
     """群临时消息"""
 
-    sub_type = "group_temp"
+    sub_type: Literal["group_temp"]
     to_me = True
     group_id: str
     """群 ID"""
@@ -44,9 +46,9 @@ class WQRequestEvent(RequestEvent):
     request_id: int
     """flag"""
 
-    async def approve(self, bot: "Bot"):
+    async def accept(self, bot: "Bot"):
         """同意当前请求"""
-        raise ValueError("Request has no approve!")
+        raise ValueError("Request has no accept!")
 
     async def reject(self, bot: "Bot", block: bool = False, message: str = ""):
         """拒绝当前请求
@@ -67,20 +69,20 @@ class WQFriendAddRequestEvent(WQRequestEvent):
     user_name: str
     message: str
 
-    async def approve(self, bot: "Bot"):
-        return await bot.call_api("set_new_friend",
-                                  request_id=self.request_id,
-                                  user_id=self.user_id,
-                                  approve=True,
-                                  )
+    async def accept(self, bot: Bot):
+        return await bot.set_new_friend(
+            request_id=self.request_id,
+            user_id=self.user_id,
+            accept=True,
+        )
 
-    async def reject(self, bot: "Bot"):
+    async def reject(self, bot: Bot):
         """拒绝当前请求"""
-        return await bot.call_api("set_new_friend",
-                                  request_id=self.request_id,
-                                  user_id=self.user_id,
-                                  approve=False,
-                                  )
+        return await bot.set_new_friend(
+            request_id=self.request_id,
+            user_id=self.user_id,
+            accept=False,
+        )
 
 
 class WQGroupJoinRequestEvent(WQRequestEvent):
@@ -96,23 +98,23 @@ class WQGroupJoinRequestEvent(WQRequestEvent):
     invitor_id: str = None
     invitor_name: str = None
 
-    async def approve(self, bot: "Bot"):
-        return await bot.call_api("set_join_group",
-                                  request_id=self.request_id,
-                                  user_id=self.user_id,
-                                  group_id=self.group_id,
-                                  approve=True,
-                                  )
+    async def accept(self, bot: "Bot"):
+        return await bot.set_join_group(
+            request_id=self.request_id,
+            user_id=self.user_id,
+            group_id=self.group_id,
+            accept=True,
+        )
 
     async def reject(self, bot: "Bot", block: bool = False, message: str = ""):
-        return await bot.call_api("set_join_group",
-                                  request_id=self.request_id,
-                                  user_id=self.user_id,
-                                  group_id=self.group_id,
-                                  approve=False,
-                                  block=block,
-                                  message=message,
-                                  )
+        return await bot.set_join_group(
+            request_id=self.request_id,
+            user_id=self.user_id,
+            group_id=self.group_id,
+            accept=False,
+            block=block,
+            message=message,
+        )
 
 
 class WQGroupinvItedRequestEvent(WQRequestEvent):
@@ -123,18 +125,20 @@ class WQGroupinvItedRequestEvent(WQRequestEvent):
     invitor_id: str = None
     invitor_name: str = None
 
-    async def approve(self, bot: "Bot"):
-        return await bot.call_api("set_join_group",
-                                  request_id=self.request_id,
-                                  approve=True,
-                                  )
+    async def accept(self, bot: "Bot"):
+        return await bot.set_group_invited(
+            request_id=self.request_id,
+            group_id=self.group_id,
+            accept=self.invitor_id,
+        )
 
     async def reject(self, bot: "Bot"):
         """拒绝当前请求"""
-        return await bot.call_api("set_join_group",
-                                  request_id=self.request_id,
-                                  approve=False,
-                                  )
+        return await bot.set_group_invited(
+            request_id=self.request_id,
+            group_id=self.group_id,
+            accept=False,
+        )
 
 
 __all__ = [
