@@ -1,20 +1,19 @@
-from nonebot.adapters.onebot.v12 import NoticeEvent, PrivateMessageEvent, RequestEvent
+from nonebot.adapters.onebot.v12 import NoticeEvent, MessageEvent, RequestEvent
 from typing_extensions import Literal
 
-# from nonebot.typing import overrides # 以后可能会用
+from nonebot.typing import overrides
 from .bot import Bot
 
 
-class WQGroupTempPrivateMessageEvent(PrivateMessageEvent):
+class WQGroupTempMessageEvent(MessageEvent):
     """群临时消息"""
 
-    sub_type: Literal["group_temp"]
+    detail_type: Literal["group_temp"]
     to_me = True
     group_id: str
     """群 ID"""
     user_name: str
     """发送者用户名称/昵称"""
-    ...
 
 
 class WQFriendPokeNotice(NoticeEvent):
@@ -142,7 +141,7 @@ class WQGroupinvItedRequestEvent(WQRequestEvent):
 
 
 __all__ = [
-    "WQGroupTempPrivateMessageEvent",
+    "WQGroupTempMessageEvent",
     "WQFriendPokeNotice",
     "WQGroupNameUpdateNotice",
     "WQFriendAddRequestEvent",
